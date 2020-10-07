@@ -9,7 +9,14 @@
 #include "ArgsParser.h"
 #include "CostVolumeEnergy.h"
 #include "Utilities.hpp"
+
+#ifdef __unix
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/stat.h> 
+#else
 #include <direct.h>
+#endif
 
 struct Options
 {
@@ -286,15 +293,20 @@ void MidV2(const std::string inputDir, const std::string outputDir, const Option
 	param.lambda = options.smooth_weight;
 
 	{
+#ifdef __unix
+		if(access((outputDir + "debug").c_str(), R_OK | W_OK) != 0){
+			mkdir((outputDir + "debug").c_str(), 0755);
+		}
+#else
 		_mkdir((outputDir + "debug").c_str());
-
-		Evaluator *eval = new Evaluator(dispGT, nonocc, 255.0f / (maxdisp), "result", outputDir + "debug\\");
+#endif
+		Evaluator *eval = new Evaluator(dispGT, nonocc, 255.0f / (maxdisp), "result", outputDir + "debug/");
 		eval->setPrecision(calib.gt_prec);
 		eval->showProgress = false;
 		eval->setErrorThreshold(errorThresh);
 
 		FastGCStereo stereo(imL, imR, param, maxdisp, 0, vdisp);
-		stereo.saveDir = outputDir + "debug\\";
+		stereo.saveDir = outputDir + "debug/";
 		stereo.setEvaluator(eval);
 
 		IProposer* prop1 = new ExpansionProposer(1);
@@ -375,7 +387,13 @@ void MidV3(const std::string inputDir, const std::string outputDir, const Option
 
 
 	{
+#ifdef __unix
+		if(access((outputDir + "debug").c_str(), R_OK | W_OK) != 0){
+			mkdir((outputDir + "debug").c_str(), 0755);
+		}
+#else
 		_mkdir((outputDir + "debug").c_str());
+#endif
 
 		Evaluator *eval = new Evaluator(dispGT, nonocc, 255.0f / (maxdisp), "result", outputDir + "debug\\");
 		eval->setPrecision(-1);
@@ -429,13 +447,22 @@ int main(int argc, const char** args)
 	options.loadOptionValues(parser);
 	unsigned int seed = (unsigned int)time(NULL);
 #if 0
-	// For debugging
+	// For debugging MiddV3
 	//  1  99.4        262247  252693  9554    10.51   8.54
 	options.targetDir = "../data/MiddV3/trainingH/Adirondack";
 	options.outputDir = "../results/Adirondack";
 	options.mode = "MiddV3";
 	options.smooth_weight = 0.5;
 	options.pmIterations = 2;
+	//options.threadNum = 1;
+	seed = 0;
+#else 
+	// For debugging MiddV2
+	options.targetDir = "../data/MiddV2/cones";
+	options.outputDir = "../results/cones";
+	options.mode = "MiddV2";
+	options.smooth_weight = 1;
+	options.doDual = 1;
 	//options.threadNum = 1;
 	seed = 0;
 #endif
@@ -452,8 +479,18 @@ int main(int argc, const char** args)
 	if (options.threadNum > 0)
 		omp_set_num_threads(options.threadNum);
 
-	if (options.outputDir.length())
+	if (options.outputDir.length()){
+#ifdef __unix
+		if(access((options.outputDir).c_str(), R_OK | W_OK) != 0){
+			if(mkdir((options.outputDir).c_str(), 0755) == -1){
+				printf("can not make directory %s \n", (options.outputDir).c_str());
+				return -1;
+			}
+		}
+#else
 		_mkdir((options.outputDir).c_str());
+#endif
+	}
 
 	printf("\n\n");
 

@@ -3,6 +3,16 @@
 #include <opencv2/core/core.hpp>
 #include <fstream>
 
+#include <stdio.h>
+
+#ifdef __unix
+
+#include <stdint.h>
+
+#define fopen_s(pFile,filename,mode) ((*(pFile))=fopen((filename),  (mode)))==NULL
+#define __int32 int32_t
+#endif
+
 namespace cvutils
 {
 	namespace io
@@ -35,7 +45,7 @@ namespace cvutils
 			if (strcmp(buf, "Pf") == 0) channel = 1;
 			else if (strcmp(buf, "PF") == 0) channel = 3;
 			else {
-				printf(buf);
+				printf("%s\n", buf);
 				printf("Not a 1/3 channel PFM file.\n");
 				return cv::Mat();
 			}

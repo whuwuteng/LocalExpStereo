@@ -3,6 +3,10 @@
 #include <map>
 #include <string>
 
+//reference https://stackoverflow.com/questions/3052579/explicit-specialization-in-non-namespace-scope
+template<typename T>
+struct identity { typedef T type; };
+
 class ArgsParser
 {
 	std::vector<std::string> args;
@@ -19,24 +23,28 @@ class ArgsParser
 				{
 					argMap[name] = args[i + 1];
 					i++;
-					//std::cout << name << ": " << argMap[name] << std::endl;
+					std::cout << name << ": " << argMap[name] << std::endl;
 				}
 			}
 		}
 	}
-	template <typename T>
-	T convertStringToValue(std::string str) const
+	
+	// I do not know
+	/*template <typename T>
+	T convertStringToValue(std::string str, identity<T>) const
 	{
-		return (T)std::stod(str);
-	}
-	template <> float convertStringToValue(std::string str) const{ return std::stof(str); }
-	template <> int convertStringToValue(std::string str) const{ return std::stoi(str); }
-	template <> std::string convertStringToValue(std::string str)const { return str; }
-	template <> bool convertStringToValue(std::string str) const
+		//return (T)std::stod(str);
+	}*/
+
+	double convertStringToValue(std::string str, identity<double>) const{ return std::stod(str); }
+	float convertStringToValue(std::string str, identity<float>) const{ return std::stof(str); }
+	int convertStringToValue(std::string str, identity<int>) const{ return std::stoi(str); }
+	std::string convertStringToValue(std::string str, identity<std::string>)const { return str; }
+	bool convertStringToValue(std::string str, identity<bool>) const
 	{
 		if (str == "true") return true;
 		if (str == "false") return false;
-		return convertStringToValue<int>(str) != 0;
+		return convertStringToValue(str, identity<int>()) != 0;
 	}
 
 public:
@@ -61,7 +69,7 @@ public:
 		if (it == argMap.end())
 			return false;
 
-		value = convertStringToValue<T>(it->second);
+		value = convertStringToValue(it->second, identity<T>());
 		return true;
 	}
 };

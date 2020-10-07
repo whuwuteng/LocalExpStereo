@@ -47,7 +47,7 @@ public:
 		, fp_energy(nullptr)
 		, fp_output(nullptr)
 	{
-
+		//printf("%s && %s\n", header.c_str(), saveDir.c_str());
 		if (save)
 		{
 			//fp_energy = fopen((saveDir + "log_energy.txt").c_str(), "w");
@@ -160,11 +160,12 @@ public:
 		}
 
 		if (saveProgress && save){
-			cv::imwrite(saveDir + cv::format("%s%dD%02d.png", header, mode, index), disparityMapVis * 255);
+			cv::imwrite(saveDir + cv::format("%s%dD%02d.png", header.c_str(), mode, index), disparityMapVis * 255);
 			//cv::imwrite(saveDir + cv::format("%s%dV%02d.png", header, mode, index), vdispMapVis * 255);
-			cv::imwrite(saveDir + cv::format("%s%dN%02d.png", header, mode, index), normalMapVis * 255);
-			cv::imwrite(saveDir + cv::format("%s%dE%02d.png", header, mode, index), errorMapVis);
+			cv::imwrite(saveDir + cv::format("%s%dN%02d.png", header.c_str(), mode, index), normalMapVis * 255);
+			cv::imwrite(saveDir + cv::format("%s%dE%02d.png", header.c_str(), mode, index), errorMapVis);
 
+			//printf("%s\n", header);
 			if (fp_output != nullptr && mode == 0)
 			{
 				fprintf(fp_output, "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", getCurrentTime(), eng2, dc2, sc2, all, nonocc);

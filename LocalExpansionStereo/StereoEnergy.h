@@ -226,23 +226,23 @@ public:
 	{
 		cv::Point pt = ps + neighbors[neighborId];
 		return smoothnessCoeff[mode][neighborId].at<float>(ps + cv::Point(M, M))
-			* std::min(fabs(ls.GetZ(ps) - lt.GetZ(ps)) + fabs(ls.GetZ(pt) - lt.GetZ(pt)), params.th_smooth) * params.lambda;
+			* std::min<float>(fabs(ls.GetZ(ps) - lt.GetZ(ps)) + fabs(ls.GetZ(pt) - lt.GetZ(pt)), params.th_smooth) * params.lambda;
 	}
 
 	float computeSmoothnessTerm(const Plane& ls, const Plane& lt, cv::Point ps, cv::Point pt, int mode = 0) const
 	{
 		return std::max(computePatchWeight(ps, pt, mode), params.epsilon)
-			* std::min(fabs(ls.GetZ(ps) - lt.GetZ(ps)) + fabs(ls.GetZ(pt) - lt.GetZ(pt)), params.th_smooth) * params.lambda;
+			* std::min<float>(fabs(ls.GetZ(ps) - lt.GetZ(ps)) + fabs(ls.GetZ(pt) - lt.GetZ(pt)), params.th_smooth) * params.lambda;
 	}
 
 	float computeSmoothnessTermWithoutConst(const Plane& ls, const Plane& lt, cv::Point ps, cv::Point pt) const
 	{
-		return std::min(fabs(ls.GetZ(ps) - lt.GetZ(ps)) + fabs(ls.GetZ(pt) - lt.GetZ(pt)), params.th_smooth);
+		return std::min<float>(fabs(ls.GetZ(ps) - lt.GetZ(ps)) + fabs(ls.GetZ(pt) - lt.GetZ(pt)), params.th_smooth);
 	}
 
 	float computeSmoothnessTermConst(cv::Point ps, cv::Point pt, int mode = 0) const
 	{
-		return std::max(computePatchWeight(ps, pt, mode), params.epsilon) * params.lambda;
+		return std::max<float>(computePatchWeight(ps, pt, mode), params.epsilon) * params.lambda;
 	}
 	float computeSmoothnessTermConst(cv::Point s, int neighborId, int mode = 0) const
 	{
@@ -622,8 +622,11 @@ public:
 		//cv::Ptr<cv::ximgproc::GuidedFilter> cvfilter;
 	};
 	
-	virtual void ComputeUnaryPotentialWithoutCheck(const cv::Rect& filterRect, const cv::Rect& targetRect, const cv::Mat& costs, const Plane& plane, Reusable& reusable = Reusable(), int mode = 0) const {};
-	virtual void ComputeUnaryPotential(const cv::Rect& filterRect, const cv::Rect& targetRect, const cv::Mat& costs, const Plane& plane, Reusable& reusabl = Reusable(), int mode = 0) const {};
+	virtual void ComputeUnaryPotentialWithoutCheck(const cv::Rect& filterRect, const cv::Rect& targetRect, const cv::Mat& costs, const Plane& plane, Reusable& reusable, int mode = 0) const {};
+	virtual void ComputeUnaryPotential(const cv::Rect& filterRect, const cv::Rect& targetRect, const cv::Mat& costs, const Plane& plane, Reusable& reusabl, int mode = 0) const {};
+	
+	//virtual void ComputeUnaryPotentialWithoutCheck(const cv::Rect& filterRect, const cv::Rect& targetRect, const cv::Mat& costs, const Plane& plane, Reusable& reusable = Reusable(), int mode = 0) const {};
+	//virtual void ComputeUnaryPotential(const cv::Rect& filterRect, const cv::Rect& targetRect, const cv::Mat& costs, const Plane& plane, Reusable& reusabl = Reusable(), int mode = 0) const {};
 };
 
 class NaiveStereoEnergy : public StereoEnergy
@@ -691,7 +694,8 @@ public:
 	}
 
 
-	void ComputeUnaryPotentialWithoutCheck(const cv::Rect& filterRect, const cv::Rect& targetRect, const cv::Mat& costs, const Plane& plane, Reusable& reusable = Reusable(), int mode = 0) const override
+	void ComputeUnaryPotentialWithoutCheck(const cv::Rect& filterRect, const cv::Rect& targetRect, const cv::Mat& costs, const Plane& plane, Reusable& reusable, int mode = 0) const override
+	//void ComputeUnaryPotentialWithoutCheck(const cv::Rect& filterRect, const cv::Rect& targetRect, const cv::Mat& costs, const Plane& plane, Reusable& reusable = Reusable(), int mode = 0) const override
 	{
 		if (reusable.pIL.empty())
 		{
@@ -736,8 +740,8 @@ public:
 			auto& I0 = reusable.pIL.at<IVec>(y, x);
 			auto& I1 = reusable.pIR.at<IVec>(y, x);
 			rawCosts.at<float>(y, x) =
-				std::min(thresh_color, fabs(I0.val[0] - I1.val[0]) + fabs(I0.val[1] - I1.val[1]) + fabs(I0.val[2] - I1.val[2])) +
-				std::min(thresh_gradient, fabs(I0.val[3] - I1.val[3]));
+				std::min<float>(thresh_color, fabs(I0.val[0] - I1.val[0]) + fabs(I0.val[1] - I1.val[1]) + fabs(I0.val[2] - I1.val[2])) +
+				std::min<float>(thresh_gradient, fabs(I0.val[3] - I1.val[3]));
 		}
 
 		cv::Rect subrect = targetRect - filterRect.tl();
@@ -753,7 +757,8 @@ public:
 			rawCosts(subrect).copyTo(costs(subrect));
 	}
 
-	void ComputeUnaryPotential(const cv::Rect& filterRect, const cv::Rect& targetRect, const cv::Mat& costs, const Plane& plane, Reusable& reusable = Reusable(), int mode = 0) const override
+	void ComputeUnaryPotential(const cv::Rect& filterRect, const cv::Rect& targetRect, const cv::Mat& costs, const Plane& plane, Reusable& reusable, int mode = 0) const override
+	//void ComputeUnaryPotential(const cv::Rect& filterRect, const cv::Rect& targetRect, const cv::Mat& costs, const Plane& plane, Reusable& reusable = Reusable(), int mode = 0) const override
 	{
 		ComputeUnaryPotentialWithoutCheck(filterRect, targetRect, costs, plane, reusable, mode);
 
