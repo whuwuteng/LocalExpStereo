@@ -42,7 +42,7 @@ The code is for research purpose only. If you use our code, please cite the abov
 - Maxflow code by Boykov and Kolmogorov [[Code v3.01]](http://vision.csd.uwo.ca/code) [[Code v3.04]](http://pub.ist.ac.at/~vnk/software.html)
 
 ## Running for Ubuntu
-<center><h2>CMakeLists for Ubuntu 16.04</h2></center>
+### CMakeLists for Ubuntu 16.04
 <UL>
 <LI> mkdir build
 <LI> cd build
