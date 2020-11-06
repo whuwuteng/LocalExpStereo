@@ -41,6 +41,15 @@ The code is for research purpose only. If you use our code, please cite the abov
 - OpenCV 3 (OpenCV 3.1.0 package will be automatically installed via NuGet upon the initial build)
 - Maxflow code by Boykov and Kolmogorov [[Code v3.01]](http://vision.csd.uwo.ca/code) [[Code v3.04]](http://pub.ist.ac.at/~vnk/software.html)
 
+## Running for Ubuntu
+<center><h2>CMakeLists for Ubuntu 16.04</h2></center>
+<UL>
+<LI> mkdir build
+<LI> cd build
+<LI> cmake ..
+<LI> make
+</UL>
+
 ## How to Run?
 1. Download and extract maxflow source code to "maxflow" directory. Modify instances.inc to add the following line
 ```

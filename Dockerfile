@@ -20,7 +20,7 @@ RUN make
 RUN make install
 
 ENV LocalExp /usr/src/LocalExp
-ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu/:${memo}
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu/:${LocalExp}
 RUN mkdir ${LocalExp}      
 
 ADD ./ ${LocalExp}/Code
